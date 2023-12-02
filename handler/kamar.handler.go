@@ -78,3 +78,15 @@ func UpdateStatusKamarHandler(ctx *fiber.Ctx) error {
         "data":    kamar,
     })
 }
+
+func KamarAvailableHandleRead(ctx *fiber.Ctx) error {
+	var kamar []entity.Kamar
+
+	result := database.DB.Where("status = ?", entity.Available).Find(&kamar)
+
+	if result.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	return ctx.JSON(kamar)
+}
