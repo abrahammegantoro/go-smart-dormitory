@@ -23,3 +23,15 @@ func KamarHandlerCreate(ctx *fiber.Ctx) error {
 	}
 	return ctx.SendString("Data Created")
 }
+
+func KamarAvailableHandleRead(ctx *fiber.Ctx) error {
+	var kamar []entity.Kamar
+
+	result := database.DB.Where("status = ?", entity.Available).Find(&kamar)
+
+	if result.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	return ctx.JSON(kamar)
+}
