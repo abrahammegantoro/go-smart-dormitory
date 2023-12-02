@@ -8,13 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/bxcodec/faker/v3"
 	"github.com/gofiber/fiber/v2"
-)
-
-var (
-	genderChoices = []entity.JenisKelamin{entity.LakiLaki, entity.Perempuan}
-	statusChoices = []entity.Status{entity.Diterima, entity.MenungguAlokasiKamar, entity.MenungguPembayaran, entity.MenungguPembuatanKontrak, entity.BelumDireview}
 )
 
 func init() {
@@ -54,24 +48,6 @@ func CalonpenghuniHandlerRead(ctx *fiber.Ctx) error {
 	})
 }
 
-func PenghuniHandlerCreate(ctx *fiber.Ctx) error {
-	for i := 0; i < 50; i++ {
-		database.DB.Create(&entity.Penghuni{
-			Email:                 faker.Email(),
-			Nama:                  faker.Name(),
-			NIM:                   strconv.FormatInt(faker.UnixTime(), 10), // Convert int64 to string
-			JenisKelamin:          genderChoices[rand.Intn(len(genderChoices))],
-			NomorTelepon:          faker.Phonenumber(),
-			KontakDarurat:         faker.Phonenumber(),
-			NamaKontakDarurat:     faker.Name(),
-			HubunganKontakDarurat: faker.TitleFemale(),
-			Alasan:                faker.Paragraph(),
-			Status:                statusChoices[rand.Intn(len(statusChoices))],
-		})
-	}
-	return ctx.SendString("Data Created")
-}
-
 const defaultPageSize = 10
 
 func PenghuniHandlerRead(ctx *fiber.Ctx) error {
@@ -103,4 +79,32 @@ func PenghuniHandlerRead(ctx *fiber.Ctx) error {
 			"totalPage": int(result.RowsAffected/int64(pageSize)) + 1,
 		},
 	)
+}
+
+func DeletePenghuni(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+
+	var penghuni entity.Penghuni
+	result := database.DB.Where("id = ?", id).Delete(&penghuni)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to delete penghuni")
+	}
+
+	return ctx.SendString("Penghuni successfully deleted")
+}
+
+func PenghuniHandlerReadById(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+
+	var calonpenghuni entity.Penghuni
+	result := database.DB.Where("id = ?", id).First(&calonpenghuni)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to fetch calonpenghuni")
+	}
+
+	return ctx.JSON(calonpenghuni)
 }
