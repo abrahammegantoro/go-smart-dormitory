@@ -39,6 +39,4 @@ type Penghuni struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
-
-	// Kontraks []Kontrak `json:"kontraks" gorm:"foreignKey:PenghuniID"`
 }

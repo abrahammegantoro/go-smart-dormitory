@@ -54,7 +54,6 @@ func GetKamarHandlerRead(ctx *fiber.Ctx) error {
 		"data":      kamar,
 		"page":      page,
 		"pageSize":  pageSize,
-		"totalPage": int(result.RowsAffected)/pageSize + 1,
 	})
 }
 

@@ -12,4 +12,5 @@ type Kontrak struct {
 
 	// relasi dengan kamar
 	KamarID uint `json:"kamar_id"`
+	PinAkses string `json:"pin_akses"`
 }

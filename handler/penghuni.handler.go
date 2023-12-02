@@ -71,7 +71,7 @@ func PenghuniHandlerCreate(ctx *fiber.Ctx) error {
 	}
 	return ctx.SendString("Data Created")
 }
-// Assuming you have appropriate associations in your models, you can use Preload to eager load related data.
+
 func PenghuniHandlerRead(ctx *fiber.Ctx) error {
 	page, err := strconv.Atoi(ctx.Query("page", "1"))
 	if err != nil || page < 1 {
