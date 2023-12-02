@@ -3,8 +3,9 @@ module go-smart-dormitory
 go 1.19
 
 require (
-	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/gofiber/fiber/v2 v2.51.0 // indirect
+	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/bxcodec/faker/v3 v3.8.1 // indirect
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
