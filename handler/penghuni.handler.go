@@ -7,7 +7,8 @@ import (
 	"math/rand"
 	"strconv"
 	"time"
-
+	"go-smart-dormitory/model/dto"
+	"github.com/bxcodec/faker/v3"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -48,24 +49,29 @@ func CalonpenghuniHandlerRead(ctx *fiber.Ctx) error {
 	})
 }
 
-const defaultPageSize = 10
-
 func PenghuniHandlerRead(ctx *fiber.Ctx) error {
 	page, err := strconv.Atoi(ctx.Query("page", "1"))
-
 	if err != nil || page < 1 {
 		log.Println(err)
 		return ctx.Status(fiber.StatusBadRequest).SendString("Invalid page number")
 	}
 
-	pageSize, err := strconv.ParseFloat(ctx.Query("pageSize", strconv.Itoa(defaultPageSize)), 64)
+	pageSize, err := strconv.ParseFloat(ctx.Query("pageSize", strconv.Itoa(10)), 64)
 	if err != nil || pageSize < 1 {
 		log.Println(err)
 		return ctx.Status(fiber.StatusBadRequest).SendString("Invalid page size")
 	}
 
-	var penghuni []entity.Penghuni
-	result := database.DB.Where("status = ?", entity.Diterima).Offset((page - 1) * 10).Limit(10).Find(&penghuni)
+	var dtoResp = []dto.GetPenghuniAktifResponseDTO{}
+
+	// Fetch Penghuni entities with related Kontrak entities where KamarID is not null
+	result := database.DB.Table("penghunis").
+    	Select("kamars.nomor_kamar, penghunis.nama, penghunis.jenis_kelamin, penghunis.nomor_telepon, penghunis.kontak_darurat").
+    	Joins("LEFT JOIN kontraks ON penghunis.id = kontraks.penghuni_id").
+    	Joins("LEFT JOIN kamars ON kontraks.kamar_id = kamars.id").
+    	Where("kontraks.kamar_id IS NOT NULL").
+    	Find(&dtoResp)
+
 
 	if result.Error != nil {
 		log.Println(result.Error)
@@ -74,7 +80,7 @@ func PenghuniHandlerRead(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(
 		fiber.Map{
-			"data":      penghuni,
+			"data":      dtoResp,
 			"page":      page,
 			"totalPage": int(result.RowsAffected/int64(pageSize)) + 1,
 		},

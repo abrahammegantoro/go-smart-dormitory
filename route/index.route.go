@@ -8,6 +8,7 @@ import (
 
 func SetupRoutes(app *fiber.App) {
 	app.Get("/", handler.UserHandlerRead)
+	app.Get("/kamar", handler.GetKamarHandlerRead)
 
 	// kamar
 	app.Post("/kamar", handler.KamarHandlerCreate)
