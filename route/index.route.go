@@ -13,4 +13,5 @@ func SetupRoutes(app *fiber.App) {
 
 	app.Get("/calon-penghuni", handler.CalonpenghuniHandlerRead)
 	app.Post("/penghuni", handler.PenghuniHandlerCreate)
+	app.Get("/penghuni", handler.PenghuniHandlerRead)
 }

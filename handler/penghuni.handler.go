@@ -71,3 +71,36 @@ func PenghuniHandlerCreate(ctx *fiber.Ctx) error {
 	}
 	return ctx.SendString("Data Created")
 }
+
+const defaultPageSize = 10
+
+func PenghuniHandlerRead(ctx *fiber.Ctx) error {
+	page, err := strconv.Atoi(ctx.Query("page", "1"))
+
+	if err != nil || page < 1 {
+		log.Println(err)
+		return ctx.Status(fiber.StatusBadRequest).SendString("Invalid page number")
+	}
+
+	pageSize, err := strconv.ParseFloat(ctx.Query("pageSize", strconv.Itoa(defaultPageSize)), 64)
+	if err != nil || pageSize < 1 {
+		log.Println(err)
+		return ctx.Status(fiber.StatusBadRequest).SendString("Invalid page size")
+	}
+
+	var penghuni []entity.Penghuni
+	result := database.DB.Where("status = ?", entity.Diterima).Offset((page - 1) * 10).Limit(10).Find(&penghuni)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to fetch penghuni")
+	}
+
+	return ctx.JSON(
+		fiber.Map{
+			"data":      penghuni,
+			"page":      page,
+			"totalPage": int(result.RowsAffected/int64(pageSize)) + 1,
+		},
+	)
+}
