@@ -81,7 +81,7 @@ func PenghuniHandlerRead(ctx *fiber.Ctx) error {
 	)
 }
 
-func DeletePenghuni(ctx *fiber.Ctx) error {
+func PenghuniHandlerDelete(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
 	var penghuni entity.Penghuni
