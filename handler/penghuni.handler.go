@@ -1,13 +1,15 @@
 package handler
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"go-smart-dormitory/database"
-	"github.com/bxcodec/faker/v3"
 	"go-smart-dormitory/model/entity"
+	"log"
 	"math/rand"
-	"time"
 	"strconv"
+	"time"
+
+	"github.com/bxcodec/faker/v3"
+	"github.com/gofiber/fiber/v2"
 )
 
 var (
@@ -21,6 +23,35 @@ func init() {
 
 func UserHandlerRead(ctx *fiber.Ctx) error {
 	return ctx.SendString("Hello, World 👋!")
+}
+
+func CalonpenghuniHandlerRead(ctx *fiber.Ctx) error {
+	var calonpenghuni []entity.Penghuni
+
+	page, err := strconv.Atoi(ctx.Query("page", "1"))
+	if err != nil {
+		log.Println("Error parsing page parameter:", err)
+		page = 1
+	}
+
+	limit := 10
+	offset := (page - 1) * limit
+
+	result := database.DB.Where("status != ?", "Diterima").Offset(offset).Limit(limit).Find(&calonpenghuni)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+	}
+
+	var totalRecords int64
+	database.DB.Model(&entity.Penghuni{}).Where("status != ?", "Diterima").Count(&totalRecords)
+
+	totalPages := (totalRecords + int64(limit) - 1) / int64(limit)
+
+	return ctx.JSON(fiber.Map{
+		"data":       calonpenghuni,
+		"totalPages": totalPages,
+	})
 }
 
 func PenghuniHandlerCreate(ctx *fiber.Ctx) error {
