@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 	"go-smart-dormitory/model/dto"
-	"github.com/bxcodec/faker/v3"
 	"github.com/gofiber/fiber/v2"
 )
 
