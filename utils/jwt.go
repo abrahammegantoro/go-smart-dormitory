@@ -15,11 +15,17 @@ func GenerateToken(claims *jwt.MapClaims) (string, error) {
 
 func VerifyToken(token string) (jwt.MapClaims, error) {
 	claims := jwt.MapClaims{}
-	_, err := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
+	jwtToken, err := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SecretKey), nil
 	})
+
 	if err != nil {
 		return nil, err
 	}
+
+	if !jwtToken.Valid {
+		return nil, err
+	}
+
 	return claims, nil
 }
