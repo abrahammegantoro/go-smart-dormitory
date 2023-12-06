@@ -2,24 +2,28 @@ package route
 
 import (
 	"go-smart-dormitory/handler"
+	"go-smart-dormitory/handler/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func SetupRoutes(app *fiber.App) {
-	app.Get("/", handler.UserHandlerRead)
-	app.Get("/kamar", handler.GetKamarHandlerRead)
+	// admin
+	app.Post("/login", handler.AdminHandlerLogin)
+
+	app.Get("/", middleware.Auth, handler.UserHandlerRead)
 
 	// kamar
-	app.Post("/kamar", handler.KamarHandlerCreate)
-	app.Get("/kamar/available", handler.KamarAvailableHandleRead)
+	app.Get("/kamar", middleware.Auth, handler.GetKamarHandlerRead)
+	app.Post("/kamar", middleware.Auth, handler.KamarHandlerCreate)
+	app.Get("/kamar/available", middleware.Auth, handler.KamarAvailableHandleRead)
 
 	// kontrak
-	app.Post("/kontrak", handler.KontrakHandlerCreate)
+	app.Post("/kontrak", middleware.Auth, handler.KontrakHandlerCreate)
 
 	// penghuni
-	app.Get("/penghuni/:id", handler.PenghuniHandlerReadById)
-	app.Delete("/penghuni/:id", handler.PenghuniHandlerDelete)
-	app.Get("/calon-penghuni", handler.CalonpenghuniHandlerRead)
-	app.Get("/penghuni", handler.PenghuniHandlerRead)
+	app.Get("/penghuni/:id", middleware.Auth, handler.PenghuniHandlerReadById)
+	app.Delete("/penghuni/:id", middleware.Auth, handler.PenghuniHandlerDelete)
+	app.Get("/calon-penghuni", middleware.Auth, handler.CalonpenghuniHandlerRead)
+	app.Get("/penghuni", middleware.Auth, handler.PenghuniHandlerRead)
 }
