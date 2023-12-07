@@ -2,6 +2,8 @@ package entity
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type JenisKelamin string
@@ -15,14 +17,13 @@ type Status string
 
 const (
 	Diterima                 Status = "Diterima"
-	MenungguAlokasiKamar     Status = "Menunggu Alokasi Kamar"
 	MenungguPembayaran       Status = "Menunggu Pembayaran"
 	MenungguPembuatanKontrak Status = "Menunggu Pembuatan Kontrak"
 	BelumDireview            Status = "Belum Direview"
 )
 
 type Penghuni struct {
-	ID           uint         `json:"id" gorm:"primaryKey"`
+	ID           uuid.UUID    `json:"id" gorm:"primary_key;unique;type:uuid;default:uuid_generate_v4()"`
 	Email        string       `json:"email" gorm:"unique"`
 	Nama         string       `json:"nama"`
 	NIM          string       `json:"nim"`

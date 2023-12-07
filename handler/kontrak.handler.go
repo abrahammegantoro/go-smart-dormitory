@@ -4,6 +4,7 @@ import (
 	"go-smart-dormitory/database"
 	"go-smart-dormitory/model/entity"
 	"log"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -27,6 +28,12 @@ func KontrakHandlerCreate(ctx *fiber.Ctx) error {
 	database.DB.First(&kamar, kontrak.KamarID)
 	kamar.Status = "Booked"
 	database.DB.Save(&kamar)
+
+	// update status penghuni
+	var penghuni entity.Penghuni
+	database.DB.First(&penghuni, kontrak.PenghuniID)
+	penghuni.Status = "Menunggu Pembayaran"
+	database.DB.Save(&penghuni)
 
 	return ctx.JSON(kontrak)
 }

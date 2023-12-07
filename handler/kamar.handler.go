@@ -3,8 +3,10 @@ package handler
 import (
 	"go-smart-dormitory/database"
 	"go-smart-dormitory/model/entity"
+	"log"
 	"math/rand"
 	"strconv"
+
 	"github.com/bxcodec/faker/v3"
 	"github.com/gofiber/fiber/v2"
 )
@@ -28,6 +30,7 @@ func GetKamarHandlerRead(ctx *fiber.Ctx) error {
 	// Pagination
 	page, err := strconv.Atoi(ctx.Query("page", "1"))
 	if err != nil || page < 1 {
+		log.Println(err)
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid page number",
 		})
@@ -35,6 +38,7 @@ func GetKamarHandlerRead(ctx *fiber.Ctx) error {
 
 	pageSize, err := strconv.Atoi(ctx.Query("pageSize", "10"))
 	if err != nil || pageSize < 1 {
+		log.Println(err)
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid page size",
 		})
@@ -45,6 +49,7 @@ func GetKamarHandlerRead(ctx *fiber.Ctx) error {
 	result := database.DB.Offset((page - 1) * pageSize).Limit(pageSize).Find(&kamar)
 
 	if result.Error != nil {
+		log.Println(result.Error)
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": result.Error,
 		})
@@ -58,36 +63,42 @@ func GetKamarHandlerRead(ctx *fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{
 		"data":      kamar,
 		"page":      page,
-		"totalPage":  totalPages,
+		"totalPage": totalPages,
 	})
 }
 
 func UpdateStatusKamarHandler(ctx *fiber.Ctx) error {
-    id := ctx.Params("id")
-    status := ctx.Query("status")
+	id := ctx.Params("id")
+	status := ctx.Query("status")
 
-    var kamar entity.Kamar
-    result := database.DB.First(&kamar, id)
+	var kamar entity.Kamar
+	result := database.DB.First(&kamar, id)
 
-    if result.Error != nil {
-        return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-            "message": result.Error,
-        })
-    }
+	if result.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": result.Error,
+		})
+	}
 
-    kamar.Status = entity.StatusKamar(status)
-    database.DB.Save(&kamar)
+	kamar.Status = entity.StatusKamar(status)
+	err := database.DB.Save(&kamar)
 
-    return ctx.JSON(fiber.Map{
-        "message": "Data updated",
-        "data":    kamar,
-    })
+	if err.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error,
+		})
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "Data updated",
+		"data":    kamar,
+	})
 }
 
 func KamarAvailableHandleRead(ctx *fiber.Ctx) error {
 	var kamar []entity.Kamar
 
-	result := database.DB.Where("status = ?", entity.Available).Find(&kamar)
+	result := database.DB.Where("status = ?", entity.Available).Order("nomor_kamar asc").Find(&kamar)
 
 	if result.Error != nil {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
