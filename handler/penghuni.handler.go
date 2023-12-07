@@ -2,12 +2,13 @@ package handler
 
 import (
 	"go-smart-dormitory/database"
+	"go-smart-dormitory/model/dto"
 	"go-smart-dormitory/model/entity"
 	"log"
 	"math/rand"
 	"strconv"
 	"time"
-	"go-smart-dormitory/model/dto"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -65,12 +66,11 @@ func PenghuniHandlerRead(ctx *fiber.Ctx) error {
 
 	// Fetch Penghuni entities with related Kontrak entities where KamarID is not null
 	result := database.DB.Table("penghunis").
-    	Select("kamars.nomor_kamar, penghunis.nama, penghunis.jenis_kelamin, penghunis.nomor_telepon, penghunis.kontak_darurat").
-    	Joins("LEFT JOIN kontraks ON penghunis.id = kontraks.penghuni_id").
-    	Joins("LEFT JOIN kamars ON kontraks.kamar_id = kamars.id").
-    	Where("kontraks.kamar_id IS NOT NULL").
-    	Find(&dtoResp)
-
+		Select("kamars.nomor_kamar, penghunis.id, penghunis.nama, penghunis.jenis_kelamin, penghunis.nomor_telepon, penghunis.kontak_darurat").
+		Joins("LEFT JOIN kontraks ON penghunis.id = kontraks.penghuni_id").
+		Joins("LEFT JOIN kamars ON kontraks.kamar_id = kamars.id").
+		Where("kontraks.kamar_id IS NOT NULL").
+		Find(&dtoResp)
 
 	if result.Error != nil {
 		log.Println(result.Error)
@@ -111,5 +111,7 @@ func PenghuniHandlerReadById(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to fetch calonpenghuni")
 	}
 
-	return ctx.JSON(calonpenghuni)
+	return ctx.JSON(fiber.Map{
+		"data": calonpenghuni,
+	})
 }
