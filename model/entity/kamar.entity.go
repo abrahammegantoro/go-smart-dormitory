@@ -15,7 +15,7 @@ const (
 )
 
 type Kamar struct {
-	ID         uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	ID         uuid.UUID `json:"id" gorm:"primary_key;unique;type:uuid;default:uuid_generate_v4()"`
 	NomorKamar uint8     `json:"nomor_kamar"`
 	Fasilitas  string    `json:"fasilitas"`
 

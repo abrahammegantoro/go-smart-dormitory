@@ -98,7 +98,7 @@ func UpdateStatusKamarHandler(ctx *fiber.Ctx) error {
 func KamarAvailableHandleRead(ctx *fiber.Ctx) error {
 	var kamar []entity.Kamar
 
-	result := database.DB.Where("status = ?", entity.Available).Find(&kamar)
+	result := database.DB.Where("status = ?", entity.Available).Order("nomor_kamar asc").Find(&kamar)
 
 	if result.Error != nil {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
