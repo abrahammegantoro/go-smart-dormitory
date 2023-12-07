@@ -19,7 +19,7 @@ func SetupRoutes(app *fiber.App) {
 	// admin
 	app.Post("/login", handler.AdminHandlerLogin)
 
-	app.Get("/", middleware.Auth, handler.UserHandlerRead)
+	app.Post("/faker", middleware.Auth, handler.PenghuniHandlerCreate)
 
 	// kamar
 	app.Get("/kamar", middleware.Auth, handler.GetKamarHandlerRead)
