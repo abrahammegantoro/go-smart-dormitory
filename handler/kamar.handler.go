@@ -50,10 +50,15 @@ func GetKamarHandlerRead(ctx *fiber.Ctx) error {
 		})
 	}
 
+	var totalRecords int64
+	database.DB.Model(&entity.Kamar{}).Where("status != ?", "Diterima").Count(&totalRecords)
+	limit := 10
+	totalPages := (totalRecords + int64(limit) - 1) / int64(limit)
+
 	return ctx.JSON(fiber.Map{
 		"data":      kamar,
 		"page":      page,
-		"pageSize":  pageSize,
+		"totalPage":  totalPages,
 	})
 }
 
