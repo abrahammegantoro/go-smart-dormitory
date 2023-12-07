@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"strconv"
 	"time"
-
+	"strings"
 	"github.com/bxcodec/faker/v3"
 	"github.com/gofiber/fiber/v2"
 )
@@ -42,7 +42,8 @@ func PenghuniHandlerCreate(ctx *fiber.Ctx) error {
 
 func CalonpenghuniHandlerRead(ctx *fiber.Ctx) error {
 	var calonpenghuni []entity.Penghuni
-
+	search := ctx.Query("search", "")
+	
 	page, err := strconv.Atoi(ctx.Query("page", "1"))
 	if err != nil {
 		log.Println("Error parsing page parameter:", err)
@@ -52,14 +53,15 @@ func CalonpenghuniHandlerRead(ctx *fiber.Ctx) error {
 	limit := 10
 	offset := (page - 1) * limit
 
-	result := database.DB.Where("status != ?", "Diterima").Offset(offset).Limit(limit).Find(&calonpenghuni)
+
+	result := database.DB.Where("status != ? AND LOWER(nama) LIKE ?", "Diterima", "%"+strings.ToLower(search)+"%").Offset(offset).Limit(limit).Find(&calonpenghuni)
 
 	if result.Error != nil {
 		log.Println(result.Error)
 	}
 
 	var totalRecords int64
-	database.DB.Model(&entity.Penghuni{}).Where("status != ?", "Diterima").Count(&totalRecords)
+	database.DB.Model(&entity.Penghuni{}).Where("status != ? AND LOWER(nama) LIKE ?", "Diterima", "%"+strings.ToLower(search)+"%").Count(&totalRecords)
 
 	totalPages := (totalRecords + int64(limit) - 1) / int64(limit)
 
@@ -70,6 +72,8 @@ func CalonpenghuniHandlerRead(ctx *fiber.Ctx) error {
 }
 
 func PenghuniHandlerRead(ctx *fiber.Ctx) error {
+	search := ctx.Query("search", "")
+
 	page, err := strconv.Atoi(ctx.Query("page", "1"))
 	if err != nil || page < 1 {
 		log.Println(err)
@@ -89,7 +93,7 @@ func PenghuniHandlerRead(ctx *fiber.Ctx) error {
 		Select("kamars.nomor_kamar, penghunis.id, penghunis.nama, penghunis.jenis_kelamin, penghunis.nomor_telepon, penghunis.kontak_darurat").
 		Joins("LEFT JOIN kontraks ON penghunis.id = kontraks.penghuni_id").
 		Joins("LEFT JOIN kamars ON kontraks.kamar_id = kamars.id").
-		Where("kontraks.kamar_id IS NOT NULL AND penghunis.status = ?", "Diterima").
+		Where("kontraks.kamar_id IS NOT NULL AND penghunis.status = ? AND LOWER(penghunis.nama) LIKE ?", "Diterima", "%"+strings.ToLower(search)+"%").
 		Find(&dtoResp)
 
 	if result.Error != nil {

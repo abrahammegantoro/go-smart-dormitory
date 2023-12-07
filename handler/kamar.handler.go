@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"strconv"
-
 	"github.com/bxcodec/faker/v3"
 	"github.com/gofiber/fiber/v2"
 )
@@ -27,6 +26,25 @@ func KamarHandlerCreate(ctx *fiber.Ctx) error {
 }
 
 func GetKamarHandlerRead(ctx *fiber.Ctx) error {
+	//search
+	search := ctx.Query("search", "")
+	log.Println(search)
+	if search != "" {
+		var kamar []entity.Kamar
+		result := database.DB.Where("nomor_kamar = ?", search).Find(&kamar)
+		if result.Error != nil {
+			log.Println(result.Error)
+			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": result.Error,
+			})
+		}
+		return ctx.JSON(fiber.Map{
+			"data": kamar,
+			"page": 1,
+			"totalPage": 1,
+		})
+	}
+
 	// Pagination
 	page, err := strconv.Atoi(ctx.Query("page", "1"))
 	if err != nil || page < 1 {
@@ -46,14 +64,14 @@ func GetKamarHandlerRead(ctx *fiber.Ctx) error {
 
 	// Fetch paginated data from the database
 	var kamar []entity.Kamar
-	result := database.DB.Offset((page - 1) * pageSize).Limit(pageSize).Find(&kamar)
-
+	result := database.DB.Order("nomor_kamar asc").Offset((page - 1) * pageSize).Limit(pageSize).Find(&kamar)
 	if result.Error != nil {
 		log.Println(result.Error)
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": result.Error,
 		})
 	}
+	
 
 	var totalRecords int64
 	database.DB.Model(&entity.Kamar{}).Where("status != ?", "Diterima").Count(&totalRecords)
