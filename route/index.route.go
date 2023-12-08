@@ -38,3 +38,11 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/calon-penghuni", middleware.Auth, handler.CalonpenghuniHandlerRead)
 	app.Delete("/calon-penghuni/:id", middleware.Auth, handler.CalonPenghuniHandlerDelete)
 }
+
+// database.DB.Table("penghunis").
+// 		Select("kamars.nomor_kamar, penghunis.id, penghunis.nama, penghunis.jenis_kelamin, penghunis.nomor_telepon, penghunis.kontak_darurat").
+// 		Joins("LEFT JOIN kontraks ON penghunis.id = kontraks.penghuni_id").
+// 		Joins("LEFT JOIN kamars ON kontraks.kamar_id = kamars.id").
+// 		Where("kontraks.kamar_id IS NOT NULL AND penghunis.status = ? AND LOWER(penghunis.nama) LIKE ?", "Diterima", "%"+strings.ToLower(search)+"%").
+// 		Offset(offset).Limit(limit).
+// 		Find(&dtoResp)

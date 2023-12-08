@@ -94,6 +94,7 @@ func PenghuniHandlerRead(ctx *fiber.Ctx) error {
 		Joins("LEFT JOIN kontraks ON penghunis.id = kontraks.penghuni_id").
 		Joins("LEFT JOIN kamars ON kontraks.kamar_id = kamars.id").
 		Where("kontraks.kamar_id IS NOT NULL AND penghunis.status = ? AND LOWER(penghunis.nama) LIKE ?", "Diterima", "%"+strings.ToLower(search)+"%").
+		Offset((page-1) * 10).Limit(10).Order("kamars.nomor_kamar asc").
 		Find(&dtoResp)
 
 	if result.Error != nil {
@@ -101,11 +102,21 @@ func PenghuniHandlerRead(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to fetch penghuni")
 	}
 
+	var totalRecords int64
+	database.DB.Table("penghunis").
+		Select("kamars.nomor_kamar, penghunis.id, penghunis.nama, penghunis.jenis_kelamin, penghunis.nomor_telepon, penghunis.kontak_darurat").
+		Joins("LEFT JOIN kontraks ON penghunis.id = kontraks.penghuni_id").
+		Joins("LEFT JOIN kamars ON kontraks.kamar_id = kamars.id").
+		Where("kontraks.kamar_id IS NOT NULL AND penghunis.status = ? AND LOWER(penghunis.nama) LIKE ?", "Diterima", "%"+strings.ToLower(search)+"%").
+		Count(&totalRecords)
+
+	totalPages := (totalRecords + int64(10) - 1) / int64(10)
+
 	return ctx.JSON(
 		fiber.Map{
 			"data":      dtoResp,
 			"page":      page,
-			"totalPage": int(result.RowsAffected/int64(pageSize)) + 1,
+			"totalPage": totalPages,
 		},
 	)
 }
