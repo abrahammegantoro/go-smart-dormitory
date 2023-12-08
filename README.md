@@ -81,6 +81,19 @@ Penghuni juga dapat dihapus apabila sudah bukan menjadi anggota dormitory lagi.
 
 ![image](https://github.com/abrahammegantoro/go-smart-dormitory/assets/52821168/e19c4fe1-ef95-4f00-b5d7-1c50e8f82515)
 
+## API
+
+| Method | Endpoint | Realisasi         | Relasi | Fungsi                  |
+|--------|----------|------------------|--------|-------------------------|
+| POST   | /login   | app.Post(“/login”, handler.Login)| Login | Handler login dengan mengecek username dan password dan mengembalikan JWT token untuk authorisasi |
+| GET    | /kamar   | app.Get("/kamar", auth, handler.GetKamarHandlerRead)| Kamar | Mengambil seluruh kamar yang ada, melewati middleware auth sebagai authorisasi |
+| GET    | /kamar/available | app.Get("/kamar/available", auth, handler.KamarAvailableHandleRead)| Kamar | Mengambil kamar yang available (tidak booking atau tidak occupied) |
+| POST   | /kontrak   | app.Post("/kontrak", auth, handler.KontrakHandlerCreate)| Kontrak | Membuat kontrak berisi alokasi kamar, pin akses, tanggal masuk, tanggal keluar untuk penghuni yang akan diterima |
+| GET    | /penghuni/{id} | app.Get("/penghuni/:id", auth, handler.PenghuniHandlerReadById) | Penghuni | Mengambil penghuni spesifik dengan id untuk melihat detail salah satu penghuni (bisa jadi calon penghuni) |
+| DELETE | /penghuni/{id} | app.Delete("/penghuni/:id", auth, handler.PenghuniHandlerDelete) | Penghuni | Menghapus salah satu penghuni (calon penghuni) yang ditolak |
+| GET    | /calon-penghuni | app.Get("/calon-penghuni", auth, handler.CalonpenghuniHandlerRead) | Penghuni | Mengambil penghuni yang merupakan calon (mengambil penghuni dengan status != diterima) |
+| GET    | /penghuni       | app.Get("/penghuni", auth, handler.PenghuniHandlerRead) | Penghuni | Mengambil semua data penghuni yang sudah diterima |
+
 
 
 
