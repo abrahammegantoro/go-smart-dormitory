@@ -50,7 +50,7 @@ Repositori ini bertujuan untuk menyimpan *source code* untuk *prototype* dari Sm
 
    ![image](https://github.com/abrahammegantoro/go-smart-dormitory/assets/52821168/db889803-b6b0-4619-8d82-51dcf1b8ff26)
 
-6. Alokasikan kamar pada calon penghuni dengan *dropdown* dan masukkan pin akses pada kolom-kolom tersebut. Setelah itu, klik **Kirim Kontak**.
+6. Alokasikan kamar pada calon penghuni dengan *dropdown* dan masukkan pin akses pada kolom-kolom tersebut. Pastikan juga tanggal masuk dan tanggal keluar sudah dipilih. Setelah itu, klik **Kirim Kontak**.
 
    ![image](https://github.com/abrahammegantoro/go-smart-dormitory/assets/52821168/52e1b18a-6693-4035-8f17-74f4da8fed10)
 
@@ -85,14 +85,17 @@ Penghuni juga dapat dihapus apabila sudah bukan menjadi anggota dormitory lagi.
 
 | Method | Endpoint | Realisasi         | Relasi | Fungsi                  |
 |--------|----------|------------------|--------|-------------------------|
-| POST   | /login   | app.Post(“/login”, handler.Login)| Login | Handler login dengan mengecek username dan password dan mengembalikan JWT token untuk authorisasi |
+| POST   | /login   | app.Post(“/login”, handler.Login)| Admin | Handler login dengan mengecek username dan password dan mengembalikan JWT token untuk authorisasi |
 | GET    | /kamar   | app.Get("/kamar", auth, handler.GetKamarHandlerRead)| Kamar | Mengambil seluruh kamar yang ada, melewati middleware auth sebagai authorisasi |
 | GET    | /kamar/available | app.Get("/kamar/available", auth, handler.KamarAvailableHandleRead)| Kamar | Mengambil kamar yang available (tidak booking atau tidak occupied) |
 | POST   | /kontrak   | app.Post("/kontrak", auth, handler.KontrakHandlerCreate)| Kontrak | Membuat kontrak berisi alokasi kamar, pin akses, tanggal masuk, tanggal keluar untuk penghuni yang akan diterima |
-| GET    | /penghuni/{id} | app.Get("/penghuni/:id", auth, handler.PenghuniHandlerReadById) | Penghuni | Mengambil penghuni spesifik dengan id untuk melihat detail salah satu penghuni (bisa jadi calon penghuni) |
-| DELETE | /penghuni/{id} | app.Delete("/penghuni/:id", auth, handler.PenghuniHandlerDelete) | Penghuni | Menghapus salah satu penghuni (calon penghuni) yang ditolak |
-| GET    | /calon-penghuni | app.Get("/calon-penghuni", auth, handler.CalonpenghuniHandlerRead) | Penghuni | Mengambil penghuni yang merupakan calon (mengambil penghuni dengan status != diterima) |
 | GET    | /penghuni       | app.Get("/penghuni", auth, handler.PenghuniHandlerRead) | Penghuni | Mengambil semua data penghuni yang sudah diterima |
+| GET    | /penghuni/{id} | app.Get("/penghuni/:id", auth, handler.PenghuniHandlerReadById) | Penghuni | Mengambil penghuni spesifik dengan id untuk melihat detail salah satu penghuni (bisa jadi calon penghuni) |
+| DELETE | /penghuni/{id} | app.Delete("/penghuni/:id", auth, handler.PenghuniHandlerDelete) | Penghuni | Menghapus salah satu penghuni yang sudah diterima, mengubah status kamar yang ditempati penghuni tersebut menjadi “Available”, dan menghapus kontrak penghuni tersebut |
+| PATCH  | /penghuni/{id} | app.Patch("/penghuni/:id", middleware.Auth, handler.PenghuniHandlerUpdateStatus) | Penghuni | Mengubah status penghuni dari status = “Menunggu Pembayaran” jadi “Diterima” dan dari status = “Belum Direview” jadi “Menunggu Pembuatan Kontrak”  |
+| GET    | /calon-penghuni | app.Get("/calon-penghuni", auth, handler.CalonpenghuniHandlerRead) | Penghuni | Mengambil penghuni yang merupakan calon (mengambil penghuni dengan status != diterima) |
+| DELETE | /calon-penghuni |app.Delete("/calon-penghuni/:id", middleware.Auth, handler.CalonPenghuniHandlerDelete) | Penghuni | Menghapus salah satu penghuni (calon penghuni) yang ditolak |
+
 
 
 
