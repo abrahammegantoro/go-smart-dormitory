@@ -24,7 +24,7 @@ Repositori ini bertujuan untuk menyimpan *source code* untuk *prototype* dari Sm
 3. Perangkat yang terhubung ke internet
 
 ### Login
-1. Buka [http](https://smart-dormitory.vercel.app)https://smart-dormitory.vercel.app
+1. Buka [https://smart-dormitory.vercel.app](https://smart-dormitory.vercel.app)
 2. Klik 'Login' untuk masuk ke laman login. Masukkan *username* dan *password* yaitu:
    
    ```
